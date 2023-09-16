@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+
+    <style>
+        #slider {
+            width: 500px;
+            margin: 0 auto;
+            background-image: -webkit-linear-gradient(left, rgb(255, 0, 0) 0%, rgb(255, 165, 0) 28%, rgb(255, 255, 0) 72%, rgb(0, 255, 0) 100%);
+            background-image: -moz-linear-gradient(left, rgb(255, 0, 0) 0%, rgb(255, 165, 0) 28%, rgb(255, 255, 0) 72%, rgb(0, 255, 0) 100%);
+            background-image: -o-linear-gradient(left, rgb(255, 0, 0) 0%, rgb(255, 165, 0) 28%, rgb(255, 255, 0) 72%, rgb(0, 255, 0) 100%);
+            background-image: linear-gradient(left, rgb(255, 0, 0) 0%, rgb(255, 165, 0) 28%, rgb(255, 255, 0) 72%, rgb(0, 255, 0) 100%);
+        }
+
+        #result {
+            width: 100px;
+            height: 100px;
+            margin: 100px auto;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="">
+    <h1>
+        Focus
+    </h1>
+    <div id="slider">
+        <div style="color: transparent;">sag</div>
+    </div>
+    <div id="result"></div>
+</div>
+</body>
+<script>
+    $(document).ready(function () {
+        var gradient = [
+            [0, [255, 0, 0]],
+            [28, [255, 165, 0]],
+            [72, [255, 255, 0]],
+            [100, [0, 255, 0]]
+        ];
+
+        var sliderWidth = 500;
+
+        $("#slider").slider({
+            min: 1,
+            slide: function (event, ui) {
+                console.log(ui.value);
+
+                var colorRange = []
+                $.each(gradient, function (index, value) {
+                    if (ui.value <= value[0]) {
+                        colorRange = [index - 1, index]
+                        return false;
+                    }
+                });
+
+                //Get the two closest colors
+                var firstcolor = gradient[colorRange[0]][1];
+                var secondcolor = gradient[colorRange[1]][1];
+
+                //Calculate ratio between the two closest colors
+                var firstcolor_x = sliderWidth * (gradient[colorRange[0]][0] / 100);
+                var secondcolor_x = sliderWidth * (gradient[colorRange[1]][0] / 100) - firstcolor_x;
+                var slider_x = sliderWidth * (ui.value / 100) - firstcolor_x;
+                var ratio = slider_x / secondcolor_x
+
+                //Get the color with pickHex(thx, less.js's mix function!)
+                var result = pickHex(secondcolor, firstcolor, ratio);
+
+                $('#result').css("background-color", 'rgb(' + result.join() + ')');
+            }
+        });
+
+        function pickHex(color1, color2, weight) {
+            var w = weight * 2 - 1;
+            var w1 = (w / 1 + 1) / 2;
+            var w2 = 1 - w1;
+            return [
+                Math.round(color1[0] * w1 + color2[0] * w2),
+                Math.round(color1[1] * w1 + color2[1] * w2),
+                Math.round(color1[2] * w1 + color2[2] * w2)
+            ];
+        }
+    });
+</script>
+</html>

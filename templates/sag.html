@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Vertical Split with Slider</title>
+    <style>
+        body, html {
+            height: 100%;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .vertical-split {
+            display: flex;
+            height: 100%;
+        }
+
+        .vertical-split .section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .color-change {
+            transition: background-color 0.25s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+<div class="vertical-split">
+    <div class="section color-change" id="focus-color" style="background-color: #ffffff;">
+        <h2>Focus</h2>
+        <div class="container mt-5 text-center">
+            <output id="focus-value">-</output>
+        </div>
+    </div>
+    <div class="section color-change" id="speed-color" style="background-color: #ffffff;">
+        <h2>Speed</h2>
+        <div class="container mt-5 text-center">
+            <output id="speed-value">-</output>
+        </div>
+    </div>
+    <div class="section color-change" id="control-color" style="background-color: #ffffff;">
+        <h2 class="text-center">Control</h2>
+        <div class="container mt-5 text-center">
+            <div id="control-value">-</div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            function changeFocusValue(focusValue) {
+                const value = parseFloat(focusValue).toFixed(2);
+                $('#focus-color').css('background-color', 'rgb(' + getColor(value) + ')');
+                $('#focus-value').text((value / 10.0).toFixed(2));
+            }
+
+            function changeSpeedValue(focusValue) {
+                const value = parseFloat(focusValue).toFixed(2);
+                $('#speed-color').css('background-color', 'rgb(' + getColor(value) + ')');
+                $('#speed-value').text((value / 10.0).toFixed(2));
+            }
+
+            function changeControlValue(focusValue) {
+                const value = parseFloat(focusValue).toFixed(2);
+                $('#control-color').css('background-color', 'rgb(' + getColor(value) + ')');
+                $('#control-value').text((value / 10.0).toFixed(2));
+            }
+
+            var gradient = [
+                [0, [255, 0, 0]],
+                [28, [255, 165, 0]],
+                [72, [255, 255, 0]],
+                [100, [0, 255, 0]]
+            ];
+
+            var sliderWidth = 500;
+
+            function getColor(valuee) {
+                var colorRange = []
+                $.each(gradient, function (index, value) {
+                    if (valuee <= value[0]) {
+                        colorRange = [index - 1, index]
+                        return false;
+                    }
+                });
+                var firstcolor = gradient[colorRange[0]][1];
+                var secondcolor = gradient[colorRange[1]][1];
+
+                //Calculate ratio between the two closest colors
+                var firstcolor_x = sliderWidth * (gradient[colorRange[0]][0] / 100);
+                var secondcolor_x = sliderWidth * (gradient[colorRange[1]][0] / 100) - firstcolor_x;
+                var slider_x = sliderWidth * (valuee / 100) - firstcolor_x;
+                var ratio = slider_x / secondcolor_x;
+
+                //Get the color with pickHex(thx, less.js's mix function!)
+                var result = pickHex(secondcolor, firstcolor, ratio);
+
+
+                return result.join();
+            }
+
+            function pickHex(color1, color2, weight) {
+                var w = weight * 2 - 1;
+                var w1 = (w / 1 + 1) / 2;
+                var w2 = 1 - w1;
+                return [
+                    Math.round(color1[0] * w1 + color2[0] * w2),
+                    Math.round(color1[1] * w1 + color2[1] * w2),
+                    Math.round(color1[2] * w1 + color2[2] * w2)
+                ];
+            }
+
+            function getNumbers() {
+                const xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            const numbers = JSON.parse(xhr.responseText);
+                            let focus = numbers[0], speed = numbers[1], control = numbers[2];
+                            changeFocusValue(focus);
+                            changeSpeedValue(speed);
+                            changeControlValue(control);
+                        } else {
+                            console.error('Error:', xhr.statusText);
+                        }
+                    }
+                };
+
+                xhr.open('GET', '{% url 'led:numbers' %}', true);
+                xhr.send();
+            }
+
+            setInterval(getNumbers, 1000);
+        });
+    </script>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
