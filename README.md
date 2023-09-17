@@ -1,4 +1,5 @@
 # Q-man Brain Board
+![Example Image](Logo-03.png)
 
 Welcome to the Q-man Experience Classifier project! This project utilizes LEDs and Machine Learning to classify users based on their keyboard and mouse usage, aiming to measure their overall experience.
 
