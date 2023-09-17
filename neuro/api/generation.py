@@ -55,17 +55,23 @@ num_samples = 30000  # Number of random samples
 
 lognormal_samples_cpm = generate_lognormal_within_range(min_val, max_val, desired_median, num_samples)
 lognormal_samples_wpm = np.floor_divide(lognormal_samples_cpm, random.randint(5, 6))
-print(lognormal_samples_cpm)
-print(lognormal_samples_wpm)
+acc = np.random.normal(50, 50 / 0.6, num_samples)
+lognormal_samples_sat = generate_lognormal_within_range(1, 10, 6, num_samples)
+lognormal_samples_age = generate_lognormal_within_range(18, 50, 25, num_samples)
+np.save("data_cpm.npy", lognormal_samples_cpm)
+np.save("data_wpm.npy", lognormal_samples_wpm)
+np.save("data_acc.npy", acc)
+np.save("data_sat.npy", lognormal_samples_sat)
+np.save("data_age.npy", lognormal_samples_age)
 # Plot the original log-normal distribution
-plt.subplot(1, 2, 1)
-plot_lognormal_distribution(lognormal_samples_cpm, min_val, max_val)
-plt.title('Original Log-Normal Distribution')
-
-# Plot the log-normal distribution after division by 5
-plt.subplot(1, 2, 2)
-plot_lognormal_distribution(lognormal_samples_wpm, min_val / 5, max_val / 5)
-plt.title('Log-Normal Distribution (Divided by 5)')
-
-plt.tight_layout()
-plt.show()
+# plt.subplot(1, 2, 1)
+# plot_lognormal_distribution(lognormal_samples_cpm, min_val, max_val)
+# plt.title('Original Log-Normal Distribution')
+#
+# # Plot the log-normal distribution after division by 5
+# plt.subplot(1, 2, 2)
+# plot_lognormal_distribution(lognormal_samples_wpm, min_val / 5, max_val / 5)
+# plt.title('Log-Normal Distribution (Divided by 5)')
+#
+# plt.tight_layout()
+# plt.show()
